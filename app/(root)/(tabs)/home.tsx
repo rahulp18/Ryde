@@ -1,4 +1,18 @@
-import CustomButton from "@/components/CustomButton";
+import { useUser } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
+import * as Location from "expo-location";
+import { router } from "expo-router";
+import { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import GoogleTextInput from "@/components/GoogleTextInput";
 import Map from "@/components/Map";
 import RideCard from "@/components/RideCard";
@@ -6,18 +20,19 @@ import { icons, images } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import { useLocationStore } from "@/store";
 import { Ride } from "@/types/type";
-import { SignedIn, SignedOut, useUser, useClerk } from "@clerk/clerk-expo";
-import * as Location from "expo-location";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Image } from "react-native";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Home() {
-  const { setDestinationLocation, setUserLocation } = useLocationStore();
+const Home = () => {
   const { user } = useUser();
-  const [hasPermission, setHasPermission] = useState(false);
+  const { signOut } = useAuth();
+
+  const { setUserLocation, setDestinationLocation } = useLocationStore();
+
+  const handleSignOut = () => {
+    signOut();
+    router.replace("/(auth)/sign-in");
+  };
+
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
 
   const {
     data: recentRides,
@@ -47,12 +62,7 @@ export default function Home() {
       });
     })();
   }, []);
-  const { signOut } = useClerk();
 
-  const handleSignOut = () => {
-    signOut();
-    router.push("/(auth)/sign-in");
-  };
   const handleDestinationPress = (location: {
     latitude: number;
     longitude: number;
@@ -64,41 +74,38 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView className="bg-general-500 flex-1">
+    <SafeAreaView className="bg-general-500">
       <FlatList
         data={recentRides?.slice(0, 5)}
         renderItem={({ item }) => <RideCard ride={item} />}
+        keyExtractor={(item, index) => index.toString()}
         className="px-5"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           paddingBottom: 100,
         }}
         ListEmptyComponent={() => (
-          <View className="flex flex-col justify-center items-center h-full  ">
+          <View className="flex flex-col items-center justify-center">
             {!loading ? (
               <>
                 <Image
                   source={images.noResult}
                   className="w-40 h-40"
-                  alt="no recent rides found"
+                  alt="No recent rides found"
                   resizeMode="contain"
                 />
-                <Text className="text-sm">No recent routes found!</Text>
+                <Text className="text-sm">No recent rides found</Text>
               </>
             ) : (
-              <ActivityIndicator size={"small"} color={"#000"} />
+              <ActivityIndicator size="small" color="#000" />
             )}
           </View>
         )}
-        ListHeaderComponent={() => (
+        ListHeaderComponent={
           <>
-            <View className="flex flex-row items-center gap-1 justify-between my-5">
-              <Text
-                className="text-xl font-JakartaExtraBold capitalize"
-                numberOfLines={1}
-              >
-                Welcome {user?.firstName}
-                👋
+            <View className="flex flex-row items-center justify-between my-5">
+              <Text className="text-2xl font-JakartaExtraBold">
+                Welcome {user?.firstName}👋
               </Text>
               <TouchableOpacity
                 onPress={handleSignOut}
@@ -107,26 +114,30 @@ export default function Home() {
                 <Image source={icons.out} className="w-4 h-4" />
               </TouchableOpacity>
             </View>
-            {/* Google text input */}
+
             <GoogleTextInput
               icon={icons.search}
               containerStyle="bg-white shadow-md shadow-neutral-300"
               handlePress={handleDestinationPress}
             />
+
             <>
               <Text className="text-xl font-JakartaBold mt-5 mb-3">
-                Your current Location
+                Your current location
               </Text>
               <View className="flex flex-row items-center bg-transparent h-[300px]">
                 <Map />
               </View>
             </>
+
             <Text className="text-xl font-JakartaBold mt-5 mb-3">
               Recent Rides
             </Text>
           </>
-        )}
+        }
       />
     </SafeAreaView>
   );
-}
+};
+
+export default Home;
