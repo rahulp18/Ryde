@@ -32,43 +32,20 @@ const Payment = ({
   const [success, setSuccess] = useState<boolean>(false);
 
   const openPaymentSheet = async () => {
-    // await initializePaymentSheet();
+    await initializePaymentSheet();
 
-    // const { error } = await presentPaymentSheet();
+    const { error } = await presentPaymentSheet();
 
-    // if (error) {
-    //   Alert.alert(`Error code: ${error.code}`, error.message);
-    // } else {
-    //   setSuccess(true);
-    // }
-    const res = await fetchAPI("/(api)/ride/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        origin_address: userAddress,
-        destination_address: destinationAddress,
-        origin_latitude: userLatitude,
-        origin_longitude: userLongitude,
-        destination_latitude: destinationLatitude,
-        destination_longitude: destinationLongitude,
-        ride_time: rideTime.toFixed(0),
-        fare_price: parseInt(amount) * 100,
-        payment_status: "paid",
-        driver_id: driverId,
-        user_id: userId,
-      }),
-    });
-    if (res) {
-      console.log(res);
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
       setSuccess(true);
     }
   };
 
   const initializePaymentSheet = async () => {
     const { error } = await initPaymentSheet({
-      merchantDisplayName: "Ryde Go",
+      merchantDisplayName: "Example, Inc.",
       intentConfiguration: {
         mode: {
           amount: parseInt(amount) * 100,
@@ -139,10 +116,6 @@ const Payment = ({
       },
       returnURL: "myapp://book-ride",
     });
-
-    if (!error) {
-      // setLoading(true);
-    }
   };
 
   return (
