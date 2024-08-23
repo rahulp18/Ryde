@@ -33,7 +33,6 @@ const Payment = ({
 
   const openPaymentSheet = async () => {
     await initializePaymentSheet();
-
     const { error } = await presentPaymentSheet();
 
     if (error) {
@@ -116,6 +115,10 @@ const Payment = ({
       },
       returnURL: "myapp://book-ride",
     });
+
+    if (!error) {
+      // setLoading(true);
+    }
   };
 
   return (
