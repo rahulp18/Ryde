@@ -66,7 +66,6 @@ const Payment = ({
                 name: fullName || email.split("@")[0],
                 email: email,
                 amount: amount,
-                paymentMethodId: paymentMethod.id,
               }),
             }
           );
