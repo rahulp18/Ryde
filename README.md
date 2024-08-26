@@ -1,4 +1,7 @@
 # Welcome to your Expo app 👋
+IF YOU ARE FACCING SOMETHING WENT WRONG IN EXPO Run this command and paster your IPV4 address {ipconfig)
+setx /M REACT_NATIVE_PACKAGE_MANAGER_HOSTNAME 192.168.1.100
+
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
